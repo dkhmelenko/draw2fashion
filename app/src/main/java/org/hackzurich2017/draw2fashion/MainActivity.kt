@@ -15,7 +15,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun saveImage() {
-        var bitmap = drawingPad.signatureBitmap
+        var bitmap = drawingPad.sig natureBitmap
 
         // TODO Implement sending bitmap for image recognition
 
