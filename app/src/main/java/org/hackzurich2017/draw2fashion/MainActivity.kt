@@ -1,10 +1,21 @@
 package org.hackzurich2017.draw2fashion
 
+import android.Manifest
+import android.app.Activity
+import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.net.Uri
 import android.os.AsyncTask
 import android.os.Bundle
+import android.os.Environment
+import android.provider.MediaStore
+import android.support.v4.app.ActivityCompat
+import android.support.v4.content.ContextCompat
+import android.support.v4.content.FileProvider
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
+import android.widget.Toast
 import com.google.api.client.extensions.android.http.AndroidHttp
 import com.google.api.client.googleapis.json.GoogleJsonResponseException
 import com.google.api.client.json.gson.GsonFactory
@@ -15,8 +26,11 @@ import com.google.api.services.vision.v1.model.*
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.activity_main_alternative.*
 import org.hackzurich2017.draw2fashion.draw2fashion.R
 import java.io.*
+import java.text.SimpleDateFormat
+import java.util.*
 
 
 class MainActivity : AppCompatActivity() {
@@ -25,12 +39,18 @@ class MainActivity : AppCompatActivity() {
 //    private val ANDROID_CERT_HEADER = "X-Android-Cert"
 //    private val ANDROID_PACKAGE_HEADER = "X-Android-Package"
 
+    private val CAMERA_REQUEST_CODE = 1
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.activity_main_alternative)
 
-        saveButton.setOnClickListener { saveImage() }
+        // TODO saveButton.setOnClickListener { saveImage() }
+
+        takeImage.setOnClickListener { takePicture() }
+
+        openGalery.setOnClickListener { pickFromGalery() }
     }
 
     private fun saveImage() {
@@ -84,6 +104,101 @@ class MainActivity : AppCompatActivity() {
         }
 
         return imageFile
+    }
+
+    private fun takePicture() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            // Should we show an explanation?
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.CAMERA)) {
+
+                Toast.makeText(this, "Enable camera permission first", Toast.LENGTH_SHORT).show()
+            } else {
+
+                ActivityCompat.requestPermissions(this,
+                        arrayOf(Manifest.permission.CAMERA), CAMERA_REQUEST_CODE);
+            }
+        } else {
+            doStartTakePicture()
+        }
+
+    }
+
+    private fun pickFromGalery() {
+        val pickPhoto = Intent(Intent.ACTION_PICK,
+                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+        startActivityForResult(pickPhoto, 1)//one can be replaced with any action code
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int,
+                                            permissions: Array<String>, grantResults: IntArray) {
+        when (requestCode) {
+            CAMERA_REQUEST_CODE -> {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    doStartTakePicture()
+                } else {
+                    Toast.makeText(this, "Enable camera permission first", Toast.LENGTH_SHORT).show()
+                }
+                return
+            }
+        }
+    }
+
+    private fun doStartTakePicture() {
+
+        val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        // Ensure that there's a camera activity to handle the intent
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            // Create the File where the photo should go
+            var photoFile: File? = null
+            try {
+                photoFile = createImageFile();
+            } catch (e: IOException) {
+                e.printStackTrace()
+            }
+            // Continue only if the File was successfully created
+            if (photoFile != null) {
+                val photoURI = FileProvider.getUriForFile(this, "com.example.android.fileprovider",
+                        photoFile)
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
+                startActivityForResult(takePictureIntent, 0)
+            }
+        }
+    }
+
+    var currentPhotoPath: String? = null
+
+    private fun createImageFile(): File {
+        // Create an image file name
+        val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date());
+        val imageFileName = "JPEG_" + timeStamp + "_";
+        val storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        val image = File.createTempFile(
+                imageFileName,
+                ".jpg",
+                storageDir
+        );
+
+        // Save a file: path for use with ACTION_VIEW intents
+        currentPhotoPath = image.getAbsolutePath();
+        return image;
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, imageReturnedIntent: Intent?) {
+        super.onActivityResult(requestCode, resultCode, imageReturnedIntent)
+        when (requestCode) {
+            0 -> if (resultCode == Activity.RESULT_OK) {
+                val f = File(currentPhotoPath)
+                imageView.setImageURI(Uri.fromFile(f))
+            }
+            1 -> if (resultCode == Activity.RESULT_OK) {
+                val selectedImage = imageReturnedIntent?.data
+                imageView.setImageURI(selectedImage)
+            }
+        }
     }
 
     private fun callCloudVision(bitmap: Bitmap) {
