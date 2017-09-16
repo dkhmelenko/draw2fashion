@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="org.hackzurich2017.draw2fashion.draw2fashion.MainActivity">
+    tools:context="org.hackzurich2017.draw2fashion.draw2fashion.org.hackzurich2017.draw2fashion.MainActivity">
 
     <TextView
         android:layout_width="wrap_content"

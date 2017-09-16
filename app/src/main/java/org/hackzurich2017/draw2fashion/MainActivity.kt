@@ -1,7 +1,8 @@
-package org.hackzurich2017.draw2fashion.draw2fashion
+package org.hackzurich2017.draw2fashion
 
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import org.hackzurich2017.draw2fashion.draw2fashion.R
 
 class MainActivity : AppCompatActivity() {
 
