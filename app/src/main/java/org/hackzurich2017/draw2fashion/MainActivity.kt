@@ -5,6 +5,7 @@ import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.AsyncTask
 import android.os.Bundle
@@ -36,8 +37,6 @@ import java.util.*
 class MainActivity : AppCompatActivity() {
 
     private val CLOUD_VISION_API_KEY = "AIzaSyDsZ_o23WPCcTMLMJYUmjrI31GHwDc-gmg"
-//    private val ANDROID_CERT_HEADER = "X-Android-Cert"
-//    private val ANDROID_PACKAGE_HEADER = "X-Android-Package"
 
     private val CAMERA_REQUEST_CODE = 1
 
@@ -180,7 +179,7 @@ class MainActivity : AppCompatActivity() {
                 imageFileName,
                 ".jpg",
                 storageDir
-        );
+        )
 
         // Save a file: path for use with ACTION_VIEW intents
         currentPhotoPath = image.getAbsolutePath();
@@ -193,6 +192,17 @@ class MainActivity : AppCompatActivity() {
             0 -> if (resultCode == Activity.RESULT_OK) {
                 val f = File(currentPhotoPath)
                 imageView.setImageURI(Uri.fromFile(f))
+
+                val intent = Intent(this, ProductsActivity::class.java)
+                intent.putExtra(PRODUCTS_FILE_PATH, currentPhotoPath)
+                startActivity(intent)
+
+                // uploadFile(f)
+
+//                val options = BitmapFactory.Options();
+//                options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+//                val bitmap = BitmapFactory.decodeFile(currentPhotoPath, options);
+//                callCloudVision(bitmap)
             }
             1 -> if (resultCode == Activity.RESULT_OK) {
                 val selectedImage = imageReturnedIntent?.data
