@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">draw2fashion</string>
+    <string name="save_button">Save Image</string>
 </resources>
