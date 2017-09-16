@@ -1,24 +1,24 @@
 package org.hackzurich2017.draw2fashion
 
-import android.app.Activity
 import android.app.ProgressDialog
 import android.os.Bundle
+import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.DefaultItemAnimator
 import android.support.v7.widget.LinearLayoutManager
 import android.util.Log
+import android.view.View
 import android.widget.Toast
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_products.*
 import org.hackzurich2017.draw2fashion.draw2fashion.R
 import org.hackzurich2017.draw2fashion.fashionwell.Instance
-import org.hackzurich2017.draw2fashion.fashionwell.Product
 import java.io.File
 
 
 const val PRODUCTS_FILE_PATH = "PRODUCTS_FILE_PATH"
 
-class ProductsActivity : Activity() {
+class ProductsActivity : AppCompatActivity() {
 
     val productsDataList = ArrayList<Instance>()
     val productsAdapter = ProductsAdapter(productsDataList)
@@ -28,6 +28,7 @@ class ProductsActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_products)
+        initToolbar()
 
         productsList.layoutManager = LinearLayoutManager(applicationContext)
         productsList.itemAnimator = DefaultItemAnimator()
@@ -60,10 +61,16 @@ class ProductsActivity : Activity() {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({ response ->
                     showProgress(false)
-                    productsDataList.clear()
-                    response?.products?.forEach { product -> appendProducts(product.instances) }
+
+                    if (!response?.products?.isNotEmpty()!!) {
+                        emptyView.visibility = View.VISIBLE
+                    } else {
+                        productsDataList.clear()
+                        response.products.forEach { product -> appendProducts(product.instances) }
+                    }
                     Log.d("Fashion", "success")
                 }, { throwable ->
+                    emptyView.visibility = View.VISIBLE
                     showProgress(false)
                     Toast.makeText(this, "Sorry, something went wrong!", Toast.LENGTH_SHORT).show()
                     Log.e("Fashion", "Error", throwable)
@@ -76,6 +83,18 @@ class ProductsActivity : Activity() {
         } else {
             progressDialog?.dismiss()
         }
+    }
+
+    private fun initToolbar() {
+        val actionBar = getSupportActionBar()
+
+        actionBar?.setDisplayHomeAsUpEnabled(true)
+        actionBar?.setDisplayShowHomeEnabled(true)
+    }
+
+    override fun onSupportNavigateUp(): Boolean {
+        onBackPressed()
+        return true
     }
 
 }

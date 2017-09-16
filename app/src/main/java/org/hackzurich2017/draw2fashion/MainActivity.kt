@@ -28,6 +28,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_main_alternative.*
+import kotlinx.android.synthetic.main.activity_products.*
 import org.hackzurich2017.draw2fashion.draw2fashion.R
 import java.io.*
 import java.text.SimpleDateFormat
@@ -301,4 +302,5 @@ class MainActivity : AppCompatActivity() {
 
         return resultList
     }
+
 }
