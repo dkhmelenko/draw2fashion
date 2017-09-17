@@ -25,6 +25,7 @@
 
     <Button
         android:id="@+id/saveButton"
+        style="@style/Widget.AppCompat.Button.Borderless.Colored"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="4dp"

@@ -3,4 +3,5 @@
     <string name="save_button">Save Image</string>
     <string name="take_image">Take picture</string>
     <string name="open_galery">Open galery</string>
+    <string name="pick_picture_label">Pick a picture \nand let your shopping begin</string>
 </resources>

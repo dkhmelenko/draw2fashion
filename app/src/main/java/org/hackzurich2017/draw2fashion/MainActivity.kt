@@ -5,7 +5,6 @@ import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.AsyncTask
 import android.os.Bundle
@@ -16,6 +15,7 @@ import android.support.v4.content.ContextCompat
 import android.support.v4.content.FileProvider
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
+import android.view.View
 import android.widget.Toast
 import com.google.api.client.extensions.android.http.AndroidHttp
 import com.google.api.client.googleapis.json.GoogleJsonResponseException
@@ -28,7 +28,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_main_alternative.*
-import kotlinx.android.synthetic.main.activity_products.*
 import org.hackzurich2017.draw2fashion.draw2fashion.R
 import java.io.*
 import java.text.SimpleDateFormat
@@ -126,6 +125,46 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    private fun copyFile(uri: Uri): File {
+        var out: OutputStream?
+
+        val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date());
+        val imageFileName = "JPEG_" + timeStamp + "_";
+        val storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        val image = File.createTempFile(
+                imageFileName,
+                ".jpg",
+                storageDir
+        )
+
+        out = FileOutputStream(image);
+
+        val iStream = contentResolver.openInputStream(uri)
+        val inputData = getBytes(iStream)
+
+        out.write(inputData);
+        out.close()
+
+        currentPhotoPath = image.getAbsolutePath();
+        return image
+    }
+
+    fun getBytes(inputStream: InputStream): ByteArray {
+        val byteBuffer = ByteArrayOutputStream()
+        val bufferSize = 1024
+        val buffer = ByteArray(bufferSize)
+
+        var len = 0
+        while (len != -1) {
+            len = inputStream.read(buffer)
+            if (len == -1) {
+                break
+            }
+            byteBuffer.write(buffer, 0, len)
+        }
+        return byteBuffer.toByteArray()
+    }
+
     private fun pickFromGalery() {
         val pickPhoto = Intent(Intent.ACTION_PICK,
                 android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
@@ -191,25 +230,29 @@ class MainActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, imageReturnedIntent)
         when (requestCode) {
             0 -> if (resultCode == Activity.RESULT_OK) {
+                emptyView.visibility = View.GONE
                 val f = File(currentPhotoPath)
                 imageView.setImageURI(Uri.fromFile(f))
 
-                val intent = Intent(this, ProductsActivity::class.java)
-                intent.putExtra(PRODUCTS_FILE_PATH, currentPhotoPath)
-                startActivity(intent)
+                goToProducts()
 
-                // uploadFile(f)
-
-//                val options = BitmapFactory.Options();
-//                options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-//                val bitmap = BitmapFactory.decodeFile(currentPhotoPath, options);
-//                callCloudVision(bitmap)
             }
             1 -> if (resultCode == Activity.RESULT_OK) {
+                emptyView.visibility = View.GONE
                 val selectedImage = imageReturnedIntent?.data
                 imageView.setImageURI(selectedImage)
+
+                copyFile(selectedImage!!)
+
+                goToProducts()
             }
         }
+    }
+
+    private fun goToProducts() {
+        val intent = Intent(this, ProductsActivity::class.java)
+        intent.putExtra(PRODUCTS_FILE_PATH, currentPhotoPath)
+        startActivity(intent)
     }
 
     private fun callCloudVision(bitmap: Bitmap) {
