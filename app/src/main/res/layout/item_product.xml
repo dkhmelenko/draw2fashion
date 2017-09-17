@@ -10,6 +10,8 @@
     android:layout_margin="3dp"
     card_view:cardCornerRadius="3dp"
     card_view:contentPadding="3dp"
+    android:foreground="?android:attr/selectableItemBackground"
+    android:clickable="true"
     >
 
     <LinearLayout
