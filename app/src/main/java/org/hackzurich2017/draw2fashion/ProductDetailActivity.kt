@@ -7,11 +7,13 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.widget.Toast
+import com.google.gson.Gson
 import com.squareup.picasso.Picasso
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_product_detail.*
 import org.hackzurich2017.draw2fashion.draw2fashion.R
+import org.hackzurich2017.draw2fashion.fashionwell.Instance
 
 
 class ProductDetailActivity : AppCompatActivity() {
@@ -25,7 +27,12 @@ class ProductDetailActivity : AppCompatActivity() {
         initToolbar()
 
         val sku = intent.getStringExtra(PRODUCT_SKU)
-        loadProductDetails(sku)
+        val gson = Gson()
+        val product = gson.fromJson<Instance>(sku, Instance::class.java)
+
+        setProductData(product)
+
+        // loadProductDetails(sku)
     }
 
     private fun loadProductDetails(sku: String) {
@@ -36,17 +43,7 @@ class ProductDetailActivity : AppCompatActivity() {
                 .subscribe({ response ->
                     showProgress(false)
 
-                    with(response.product) {
-                        Picasso.with(applicationContext).load(img_url).into(productImage)
-                        productTitle.text = title
-                        productPrice.text = price
-                        //productBrand.text = brand_name
-                        supportActionBar?.title = brand_name
-                        buyButton.setOnClickListener {
-                            val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(product_url))
-                            startActivity(browserIntent)
-                        }
-                    }
+                    setProductData(response)
                     Log.d("Fashion", "success")
                 }, { throwable ->
                     showProgress(false)
@@ -54,6 +51,32 @@ class ProductDetailActivity : AppCompatActivity() {
                     finish()
                     Log.e("Fashion", "Error", throwable)
                 })
+    }
+
+    private fun ProductDetailActivity.setProductData(response: ProductDetails) {
+        with(response.product) {
+            Picasso.with(applicationContext).load(img_url).into(productImage)
+            productTitle.text = title
+            productPrice.text = price
+            //productBrand.text = brand_name
+            supportActionBar?.title = brand_name
+            buyButton.setOnClickListener {
+                val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(product_url))
+                startActivity(browserIntent)
+            }
+        }
+    }
+
+    private fun ProductDetailActivity.setProductData(product: Instance) {
+        Picasso.with(applicationContext).load(product.img_url).into(productImage)
+        productTitle.text = product.title
+        productPrice.text = product.price
+        //productBrand.text = brand_name
+        supportActionBar?.title = product.brand_name
+        buyButton.setOnClickListener {
+            val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(product.product_url))
+            startActivity(browserIntent)
+        }
     }
 
 

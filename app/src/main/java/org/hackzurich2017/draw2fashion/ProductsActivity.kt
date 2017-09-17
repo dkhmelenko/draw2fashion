@@ -9,6 +9,7 @@ import android.support.v7.widget.LinearLayoutManager
 import android.util.Log
 import android.view.View
 import android.widget.Toast
+import com.google.gson.Gson
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_products.*
@@ -25,8 +26,10 @@ class ProductsActivity : AppCompatActivity() {
     val productsDataList = ArrayList<Instance>()
     val productsAdapter = ProductsAdapter(productsDataList, { pos: Int ->
         val intent = Intent(this, ProductDetailActivity::class.java)
-        val sku = productsDataList[pos].sku
-        intent.putExtra(PRODUCT_SKU, sku)
+        //val sku = productsDataList[pos].sku
+        val gson = Gson()
+        val json = gson.toJson(productsDataList[pos])
+        intent.putExtra(PRODUCT_SKU, json)
         startActivity(intent)
     })
 
