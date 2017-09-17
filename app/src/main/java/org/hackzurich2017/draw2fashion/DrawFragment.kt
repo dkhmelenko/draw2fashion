@@ -1,6 +1,8 @@
 package org.hackzurich2017.draw2fashion
 
+import android.app.ProgressDialog
 import android.content.Context
+import android.content.Intent
 import android.graphics.Bitmap
 import android.os.AsyncTask
 import android.os.Bundle
@@ -16,11 +18,13 @@ import com.google.api.client.util.ArrayMap
 import com.google.api.services.vision.v1.Vision
 import com.google.api.services.vision.v1.VisionRequestInitializer
 import com.google.api.services.vision.v1.model.*
+import com.google.gson.Gson
 import kotlinx.android.synthetic.main.activity_main.*
 import org.hackzurich2017.draw2fashion.draw2fashion.R
 import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.util.*
+import kotlin.collections.ArrayList
 
 
 /**
@@ -35,6 +39,8 @@ class DrawFragment : Fragment() {
 
     private val CLOUD_VISION_API_KEY = "AIzaSyDsZ_o23WPCcTMLMJYUmjrI31GHwDc-gmg"
 
+
+    var progressDialog: ProgressDialog? = null
 
     private var listener: OnFragmentInteractionListener? = null
 
@@ -68,6 +74,7 @@ class DrawFragment : Fragment() {
     private fun saveImage() {
         var bitmap = drawingPad.signatureBitmap
 
+        progressDialog = ProgressDialog.show(activity, "Loading...", "We are trying to recognize your picture")
         callCloudVision(bitmap)
 
         drawingPad.clear()
@@ -140,7 +147,12 @@ class DrawFragment : Fragment() {
             override fun onPostExecute(result: List<String>) {
                 Log.d("Fashion", "Response: ${result}")
 
+                progressDialog?.dismiss()
 
+                val intent = Intent(activity, RecognizedImagesActivity::class.java)
+                val arrayList = ArrayList(result)
+                intent.putStringArrayListExtra("RECOGNIZED_IMAGES", arrayList)
+                startActivity(intent)
 
             }
         }.execute()

@@ -89,7 +89,7 @@ class ProductsActivity : AppCompatActivity() {
 
     private fun showProgress(show: Boolean) {
         if (show) {
-            progressDialog = ProgressDialog.show(this, "Loading...", "")
+            progressDialog = ProgressDialog.show(this, "Loading...", "Looking for similar products")
         } else {
             progressDialog?.dismiss()
         }

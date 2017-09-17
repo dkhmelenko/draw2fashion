@@ -36,6 +36,8 @@
         </activity>
         <activity android:name="org.hackzurich2017.draw2fashion.ProductDetailActivity">
         </activity>
+        <activity android:name="org.hackzurich2017.draw2fashion.RecognizedImagesActivity">
+        </activity>
     </application>
 
 </manifest>
