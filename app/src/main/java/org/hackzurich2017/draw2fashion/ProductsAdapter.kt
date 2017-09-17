@@ -9,7 +9,8 @@ import kotlinx.android.synthetic.main.item_product.view.*
 import org.hackzurich2017.draw2fashion.draw2fashion.R
 import org.hackzurich2017.draw2fashion.fashionwell.Instance
 
-class ProductsAdapter(private val products: List<Instance>) :
+class ProductsAdapter(private val products: List<Instance>,
+                      val listener: (Int) -> Unit) :
         RecyclerView.Adapter<ProductsAdapter.ViewHolder>() {
 
     override fun getItemCount(): Int {
@@ -22,12 +23,12 @@ class ProductsAdapter(private val products: List<Instance>) :
     }
 
     override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
-        holder?.bind(products[position])
+        holder?.bind(products[position], listener)
     }
 
     class ViewHolder(containerView: View) : RecyclerView.ViewHolder(containerView) {
 
-        fun bind(product: Instance) {
+        fun bind(product: Instance, listener: (Int) -> Unit) {
             with(product) {
                 Picasso.with(itemView.context).load(img_url).into(itemView.itemImage)
                 itemView.itemTitle.text = title
@@ -35,6 +36,8 @@ class ProductsAdapter(private val products: List<Instance>) :
                 itemView.itemBrand.text = brand_name
                 itemView.seller.text = "Buy at ${shop_name}"
             }
+            itemView.isClickable = true
+            itemView.setOnClickListener { item -> listener(layoutPosition) }
         }
     }
 

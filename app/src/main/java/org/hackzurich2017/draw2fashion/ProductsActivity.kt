@@ -1,6 +1,7 @@
 package org.hackzurich2017.draw2fashion
 
 import android.app.ProgressDialog
+import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.DefaultItemAnimator
@@ -17,11 +18,17 @@ import java.io.File
 
 
 const val PRODUCTS_FILE_PATH = "PRODUCTS_FILE_PATH"
+const val PRODUCT_SKU = "PRODUCT_SKU"
 
 class ProductsActivity : AppCompatActivity() {
 
     val productsDataList = ArrayList<Instance>()
-    val productsAdapter = ProductsAdapter(productsDataList)
+    val productsAdapter = ProductsAdapter(productsDataList, { pos: Int ->
+        val intent = Intent(this, ProductDetailActivity::class.java)
+        val sku = productsDataList[pos].sku
+        intent.putExtra(PRODUCT_SKU, sku)
+        startActivity(intent)
+    })
 
     var progressDialog: ProgressDialog? = null
 

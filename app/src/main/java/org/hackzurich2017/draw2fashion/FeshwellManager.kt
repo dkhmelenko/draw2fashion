@@ -27,4 +27,8 @@ object FashwellManager {
 
         return NetworkManager.api.uploadFile(body, name);
     }
+
+    fun getDetails(sku: String): Observable<ProductDetails> {
+        return NetworkManager.api.getDetails(sku);
+    }
 }

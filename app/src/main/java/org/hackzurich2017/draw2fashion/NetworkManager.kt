@@ -10,10 +10,7 @@ import org.hackzurich2017.draw2fashion.fashionwell.ProductsResponse
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.http.Header
-import retrofit2.http.Multipart
-import retrofit2.http.POST
-import retrofit2.http.Part
+import retrofit2.http.*
 
 
 object NetworkManager {
@@ -52,9 +49,11 @@ object NetworkManager {
         @POST("/api/hackzurich/v1/attributes/")
         fun getFileAttributes(@Part image: MultipartBody.Part, @Part("name") name: RequestBody): Observable<AttributesResponse>
 
-
         @Multipart
         @POST("/api/hackzurich/v1/posts/")
         fun uploadFile(@Part image: MultipartBody.Part, @Part("name") name: RequestBody): Observable<ProductsResponse>
+
+        @GET("/api/hackzurich/v1/product/{sku}/")
+        fun getDetails(@Query("sku") sku: String): Observable<ProductDetails>
     }
 }
