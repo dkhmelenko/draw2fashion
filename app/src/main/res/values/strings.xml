@@ -4,4 +4,9 @@
     <string name="take_image">Take picture</string>
     <string name="open_galery">Open galery</string>
     <string name="pick_picture_label">Pick a picture \nand let your shopping begin</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="pickup_fragment">Pickup</string>
+    <string name="draw_fragment">Draw</string>
 </resources>
